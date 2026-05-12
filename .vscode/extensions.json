@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "golang.Go",
+    "Vue.volar",
+    "dbaeumer.vscode-eslint",
+    "ms-azuretools.vscode-docker",
+    "qwtel.sqlite-viewer",
+    "redhat.vscode-yaml",
+    "EditorConfig.EditorConfig"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug S-UI Backend",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "SUI_DB_FOLDER": "${workspaceFolder}/db",
+        "SUI_DEBUG": "true"
+      },
+      "args": []
+    },
+    {
+      "name": "Debug CLI: version",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-v"
+      ]
+    },
+    {
+      "name": "Debug CLI: setting show",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "SUI_DB_FOLDER": "${workspaceFolder}/db",
+        "SUI_DEBUG": "true"
+      },
+      "args": [
+        "setting",
+        "-show"
+      ]
+    }
+  ]
+}

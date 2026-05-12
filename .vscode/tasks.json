@@ -1,0 +1,107 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "frontend: install dependencies",
+      "type": "shell",
+      "command": "npm ci",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "frontend: dev server",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "frontend: build",
+      "type": "shell",
+      "command": "npm run build",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "frontend: lint fix",
+      "type": "shell",
+      "command": "npm run lint",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "backend: sync frontend dist",
+      "type": "shell",
+      "command": "mkdir -p web/html && find web/html -mindepth 1 -maxdepth 1 -exec rm -rf {} + && cp -R frontend/dist/. web/html/",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "backend: test",
+      "type": "shell",
+      "command": "go test ./...",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "SUI_DB_FOLDER": "${workspaceFolder}/db",
+          "SUI_DEBUG": "true"
+        }
+      },
+      "group": "test",
+      "problemMatcher": "$go"
+    },
+    {
+      "label": "backend: build simple",
+      "type": "shell",
+      "command": "go build -o sui main.go",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": "$go"
+    },
+    {
+      "label": "backend: build release",
+      "type": "shell",
+      "command": "go build -ldflags '-w -s -checklinkname=0 -extldflags \"-Wl,-no_warn_duplicate_libraries\"' -tags 'with_quic,with_grpc,with_utls,with_acme,with_gvisor,with_naive_outbound,with_musl,badlinkname,tfogo_checklinkname0,with_tailscale' -o sui main.go",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": "$go"
+    },
+    {
+      "label": "app: full rebuild",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "frontend: build",
+        "backend: sync frontend dist",
+        "backend: build release"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "app: run local",
+      "type": "shell",
+      "command": "SUI_DB_FOLDER='${workspaceFolder}/db' SUI_DEBUG=true ./sui",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "dependsOn": "backend: build simple",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "go.useLanguageServer": true,
+  "go.toolsGopath": "/Users/lulu/go",
+  "go.alternateTools": {
+    "gopls": "/Users/lulu/go/bin/gopls",
+    "dlv": "/Users/lulu/go/bin/dlv",
+    "staticcheck": "/Users/lulu/go/bin/staticcheck"
+  },
+  "gopls": {
+    "staticcheck": true
+  },
+  "go.lintTool": "staticcheck",
+  "go.lintOnSave": "package",
+  "go.testFlags": [
+    "-count=1"
+  ],
+  "go.testEnvVars": {
+    "SUI_DB_FOLDER": "${workspaceFolder}/db",
+    "SUI_DEBUG": "true"
+  },
+  "typescript.tsdk": "frontend/node_modules/typescript/lib",
+  "npm.packageManager": "npm",
+  "eslint.workingDirectories": [
+    {
+      "directory": "frontend",
+      "changeProcessCWD": true
+    }
+  ],
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "vue"
+  ],
+  "terminal.integrated.env.osx": {
+    "PATH": "/opt/homebrew/bin:/Users/lulu/go/bin:${env:PATH}"
+  },
+  "search.exclude": {
+    "**/frontend/node_modules": true,
+    "**/frontend/dist": true,
+    "**/web/html": true,
+    "**/db": true,
+    "**/bin": true,
+    "**/release": true
+  },
+  "files.watcherExclude": {
+    "**/frontend/node_modules/**": true,
+    "**/frontend/dist/**": true,
+    "**/web/html/**": true,
+    "**/db/**": true
+  },
+  "editor.formatOnSave": false,
+  "[go]": {
+    "editor.defaultFormatter": "golang.Go",
+    "editor.insertSpaces": false
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar",
+    "editor.tabSize": 2
+  },
+  "[typescript]": {
+    "editor.tabSize": 2
+  },
+  "[javascript]": {
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.tabSize": 2
+  }
+}
