@@ -2,6 +2,7 @@ import api from './api'
 import { i18n } from '@/locales'
 import router from '@/router'
 import { push } from 'notivue'
+import { getDevMockResponse } from './devMock'
 
 export interface Msg {
   success: boolean
@@ -63,6 +64,11 @@ function isMsg(obj: any): obj is Msg {
 const HttpUtils = {
   async get(url: string, data: object = {}, options: any[] = []): Promise<Msg> {
     let msg: Msg
+    const mockMsg = getDevMockResponse('get', url, data)
+    if (mockMsg) {
+      _handleMsg(mockMsg)
+      return mockMsg
+    }
     try {
         const resp = await api.get(url, { params: data, ...options })
         msg = _respToMsg(resp)
@@ -74,6 +80,11 @@ const HttpUtils = {
   },
   async post(url: string, data: object | null, options: any = undefined): Promise<Msg> {
     let msg: Msg
+    const mockMsg = getDevMockResponse('post', url, data)
+    if (mockMsg) {
+      _handleMsg(mockMsg)
+      return mockMsg
+    }
     try {
         const resp = await api.post(url, data, options)
         msg = _respToMsg(resp)

@@ -201,6 +201,8 @@ cd frontend
 npm run dev
 ```
 
+注意：`npm run dev` 会启动并持续占用 Vite 开发服务器，终端里会显示 `VITE ... ready` 和访问地址，命令不能立刻退出。`npm run build` 只是把前端打包到 `frontend/dist/`，不会启动 `3000` 端口，所以执行 `build` 后直接访问 `http://localhost:3000/app/` 会打不开。
+
 开发访问：
 
 ```text
@@ -212,6 +214,69 @@ http://localhost:3000/app/
 - Vite 端口：`3000`
 - 代理：`/app/api` 转发到 `http://localhost:2095`
 - `index.html` 中开发模式会把 `window.BASE_URL` 设置为 `/app/`
+
+### 4.1.1 后端未就绪：开发 Mock 模式（方式 3）
+
+本项目已经加了一个只在 Vite 开发环境生效的前端 Mock 模式。后端没有启动时，也可以直接进主界面改页面、调布局、看列表和弹窗。
+
+本次新增/修改文件：
+
+```text
+frontend/.env.development.example       Mock 开关示例，建议提交到仓库
+frontend/.env.development.local         本机实际启用文件，已被 .gitignore 忽略
+frontend/src/plugins/devMock.ts         前端模拟登录、数据和 API 返回
+frontend/src/plugins/httputil.ts        GET/POST 先走 devMock，未命中再走真实后端
+frontend/src/router/index.ts            开发模式可跳过登录鉴权
+frontend/src/vite-env.d.ts              补充 Vite 环境变量类型
+```
+
+当前本机 `frontend/.env.development.local` 内容：
+
+```bash
+VITE_DEV_BYPASS_AUTH=true
+VITE_DEV_MOCK=true
+```
+
+启用后操作：
+
+```bash
+cd frontend
+npm run dev
+```
+
+访问：
+
+```text
+http://localhost:3000/app/
+```
+
+效果：
+
+- `VITE_DEV_BYPASS_AUTH=true`：开发环境下不要求 `s-ui` 登录 Cookie，访问 `/app/`、`/app/inbounds`、`/app/settings` 等页面会直接进入。
+- `VITE_DEV_MOCK=true`：`api/load`、`api/save`、`api/settings`、`api/status`、`api/logs`、`api/stats`、`api/users`、`api/tokens`、`api/keypairs`、`api/checkOutbound` 等常用接口由前端本地模拟。
+- 新增、编辑、删除前端列表数据时，Mock 会在当前浏览器会话内做内存更新，刷新页面或重启 dev server 后会回到初始模拟数据。
+- `api/login` 也有模拟返回；如果关闭跳过登录但保留 Mock，可以用任意非空用户名/密码登录开发页面。
+
+关闭方式：
+
+```bash
+cd frontend
+rm .env.development.local
+```
+
+或者把文件内容改成：
+
+```bash
+VITE_DEV_BYPASS_AUTH=false
+VITE_DEV_MOCK=false
+```
+
+注意事项：
+
+- 修改 `.env.development.local` 后要停止并重新执行 `npm run dev`，Vite 才会重新读取环境变量。
+- 这个模式只用于前端开发调试，不连接真实数据库，不会真正重启后端或 Sing-Box。
+- 备份下载、真实数据库导入、真实订阅转换、真实出站检测等后端能力在 Mock 模式下只能看到模拟结果。
+- 生产构建不受影响，因为代码里同时判断了 `import.meta.env.DEV`；`npm run build` 时 Mock 和跳过登录都不会启用。
 
 ### 4.2 前端目录说明
 
@@ -226,6 +291,7 @@ frontend/src/layouts/modals/         弹窗组件
 frontend/src/store/modules/data.ts   Pinia 数据中心
 frontend/src/plugins/api.ts          Axios 基础配置
 frontend/src/plugins/httputil.ts     GET/POST 封装和消息处理
+frontend/src/plugins/devMock.ts      开发环境 Mock 数据和登录绕过
 frontend/src/locales/                多语言文案
 frontend/src/types/                  TypeScript 类型定义
 ```
@@ -537,6 +603,8 @@ trafficAge=30
 - `npm install`：通过，并修正 lock 文件；提示 4 个 npm audit 漏洞，2 moderate、2 high
 - `npm ci`：lock 修正后通过；仍提示同样的 4 个 npm audit 漏洞
 - `npm run build`：通过，生成 `frontend/dist`
+- 方式 3 Mock 改造后再次执行 `npm run build`：通过，确认不影响生产打包
+- 方式 3 Mock 改造后临时启动 `npm run dev -- --host 127.0.0.1 --port 3100`：`http://127.0.0.1:3100/app/` 返回 Vite 页面；验证后已停止，未占用 `3000`
 - 复制前端产物到 `web/html`：通过
 - 完整 tags 后端构建：通过，生成 `./sui`
 - `go test ./...`：通过，当前仓库没有测试文件
@@ -553,7 +621,7 @@ go test $(go list ./... | grep -v '/frontend/node_modules/')
 1. 先跑通 `./build.sh` 和 `SUI_DB_FOLDER=db SUI_DEBUG=true ./sui`。
 2. 熟悉登录、首页、左侧菜单和 `Data().loadData()` 的数据流。
 3. 修改一个小前端页面，例如 `Home.vue` 的展示字段或布局。
-4. 用 `npm run dev` 做热更新验证。
+4. 用 `npm run dev` 做热更新验证；后端没准备好时先使用第 4.1.1 节的方式 3 Mock 模式。
 5. 执行“前端 build -> 复制到 web/html -> go build -> 运行 sui”的完整闭环。
 6. 再读 `api/apiHandler.go`、`api/apiService.go`、`service/config.go`，理解保存、加载和重启 Sing-Box 的后端链路。
 7. 最后再碰数据库模型和迁移，这部分影响面最大。

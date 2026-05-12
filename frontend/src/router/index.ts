@@ -2,6 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '@/views/Login.vue'
 import Data from '@/store/modules/data'
+import { isDevBypassAuthEnabled } from '@/plugins/devMock'
 
 const routes = [
   {
@@ -90,7 +91,7 @@ let intervalId:any
 router.beforeEach((to) => {
   // Check the session cookie
   const sessionCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('s-ui='))
-  const isAuthenticated = !!sessionCookie
+  const isAuthenticated = isDevBypassAuthEnabled() || !!sessionCookie
 
   // If the route requires authentication and the user is not authenticated, redirect to /login
   if (to.meta.requiresAuth && !isAuthenticated) {
