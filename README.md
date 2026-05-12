@@ -1,5 +1,7 @@
 # S-UI 项目开发接手报告
 
+> 当前 README 用作新开发者接手和构建部署说明；如需参考原项目的老 README，请查看 `docs/README.md`。
+
 本文基于当前仓库 `https://github.com/cenglouvoice-cloud/s-ui.git` 的实际代码整理，目标是帮助新开发者从 0 到 1 完成环境配置、理解项目结构、修改前端页面、重新构建并部署。
 
 ## 1. 项目定位
